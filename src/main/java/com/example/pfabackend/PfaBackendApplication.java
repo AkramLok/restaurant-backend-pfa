@@ -33,10 +33,10 @@ public class PfaBackendApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
 
-        clientRepository.deleteAll();
-        waiterRepository.deleteAll();
-        ownerRepository.deleteAll();
-        restaurantRepository.deleteAll();
+       // clientRepository.deleteAll();
+        //        waiterRepository.deleteAll();
+        //        ownerRepository.deleteAll();
+        //        restaurantRepository.deleteAll();
        // restaurantRepository.save(new Restaurant(null,"B13","tilila agadir","0606060066",null,null,null,null));
         //        restaurantRepository.save(new Restaurant(null,"mister chef","tilila agadir","0654327890",null,null,null,null));
         //        restaurantRepository.save(new Restaurant(null,"food station","hay assalam agadir","0698765432",null,null,null,null));
