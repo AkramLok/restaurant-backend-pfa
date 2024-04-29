@@ -27,7 +27,11 @@ public class RewardService {
     }
 
     public List<Reward> getAllRewardsForRestaurant(Long restaurantId) {
-        return rewardRepository.findAllByProductRestaurantId(restaurantId);
+        return rewardRepository.findAllByRestaurantId(restaurantId);
+    }
+
+    public Optional<Reward> getRewardByProductId(Long productId) {
+        return rewardRepository.findByProductId(productId);
     }
 
     public Reward createOrUpdateReward(Long productId, Reward reward) {
@@ -35,7 +39,7 @@ public class RewardService {
 
         if (existingReward.isPresent()) {
             Reward currentReward = existingReward.get();
-            currentReward.setPointsPrice(reward.getPointsPrice());
+            currentReward.setRequiredPoints(reward.getRequiredPoints());
             currentReward.setProductCollection(reward.getProductCollection());
             return rewardRepository.save(currentReward);
         } else {

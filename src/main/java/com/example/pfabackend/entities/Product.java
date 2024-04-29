@@ -26,6 +26,12 @@ public class Product {
     @Column(name = "bonus_points")
     private int bonusPoints;
 
+    @Column(name = "info")
+    private String info;
+
+    @Column(name = "img")
+    private String img;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     @JsonIgnore

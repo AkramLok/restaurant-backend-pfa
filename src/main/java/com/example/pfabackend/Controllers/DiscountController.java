@@ -20,7 +20,7 @@ public class DiscountController {
 
 
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Discount>> getAllDiscounts() {
         List<Discount> discounts = discountService.getAllDiscounts();
         return ResponseEntity.ok(discounts);

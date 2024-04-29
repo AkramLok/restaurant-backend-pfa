@@ -45,6 +45,34 @@ public class ProductService {
         return productRepository.findByCategory_Id(categoryId);
     }
 
+    public Product updateProduct(Long id, Product updatedProduct) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            // Update fields if provided
+            if (updatedProduct.getName() != null) {
+                product.setName(updatedProduct.getName());
+            }
+            if (updatedProduct.getPrice() != 0) {
+                product.setPrice(updatedProduct.getPrice());
+            }
+            if (updatedProduct.getBonusPoints() != 0) {
+                product.setBonusPoints(updatedProduct.getBonusPoints());
+            }
+            if (updatedProduct.getInfo() != null) {
+                product.setInfo(updatedProduct.getInfo());
+            }
+            if (updatedProduct.getImg() != null) {
+                product.setImg(updatedProduct.getImg());
+            }
+            // Update other fields as needed
+
+            return productRepository.save(product);
+        } else {
+            throw new IllegalArgumentException("Product with ID " + id + " not found.");
+        }
+    }
+
     public void deleteProduct(Long id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);

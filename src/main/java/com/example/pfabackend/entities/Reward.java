@@ -25,5 +25,5 @@ public class Reward {
     private ProductCollection productCollection;
 
     @Column(name = "points_price")
-    private int pointsPrice; // Price in points (fidelity points)
+    private int requiredPoints; // Price in points (fidelity points)
 }

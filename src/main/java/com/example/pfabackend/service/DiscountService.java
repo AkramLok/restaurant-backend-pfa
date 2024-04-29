@@ -41,7 +41,7 @@ public class DiscountService {
 
         if (existingDiscount.isPresent()) {
             Discount currentDiscount = existingDiscount.get();
-            currentDiscount.setPercentage(discount.getPercentage());
+            currentDiscount.setDiscountPercentage(discount.getDiscountPercentage());
             currentDiscount.setProductCollection(discount.getProductCollection());
             return discountRepository.save(currentDiscount);
         } else {
@@ -63,7 +63,7 @@ public class DiscountService {
             Discount existingDiscount = optionalDiscount.get();
             existingDiscount.setProduct(newDiscount.getProduct());
             existingDiscount.setProductCollection(newDiscount.getProductCollection());
-            existingDiscount.setPercentage(newDiscount.getPercentage());
+            existingDiscount.setDiscountPercentage(newDiscount.getDiscountPercentage());
             return discountRepository.save(existingDiscount);
         } else {
             // Handle discount not found

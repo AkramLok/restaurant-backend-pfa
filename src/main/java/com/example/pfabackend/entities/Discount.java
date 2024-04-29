@@ -25,5 +25,5 @@ public class Discount {
     private ProductCollection productCollection;
 
     @Column(name = "percentage")
-    private int percentage; // Discount percentage from 1 to 99
+    private int discountPercentage; // Discount percentage from 1 to 99
 }
