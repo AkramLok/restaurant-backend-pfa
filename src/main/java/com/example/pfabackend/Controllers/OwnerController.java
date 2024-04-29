@@ -48,7 +48,7 @@ public class OwnerController {
     public ResponseEntity<Owner> createOwner(@PathVariable Long restaurantId, @RequestBody Owner owner) {
 
         Optional<Restaurant> resturant= restaurantRepository.findById(restaurantId);
-        owner.setRestaurant(resturant.get()); // Assuming there's a constructor in Restaurant class that accepts restaurantId
+        owner.setRestaurant(resturant.get());
         Owner createdOwner = ownerService.createOwner(owner);
         return new ResponseEntity<>(createdOwner, HttpStatus.CREATED);
     }
