@@ -1,9 +1,8 @@
 package com.example.pfabackend.security.jwt;
 
-import com.example.pfabackend.security.services.UserDetailsImpl;
+import com.example.pfabackend.security.services.UserClientDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +14,8 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
-public class JwtUtils {
-  private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+public class JwtClientUtils {
+  private static final Logger logger = LoggerFactory.getLogger(JwtClientUtils.class);
 
   @Value("${bezkoder.app.jwtSecret}")
   private String jwtSecret;
@@ -26,7 +25,7 @@ public class JwtUtils {
 
   public String generateJwtToken(Authentication authentication) {
 
-    UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    UserClientDetailsImpl userPrincipal = (UserClientDetailsImpl) authentication.getPrincipal();
 
     return Jwts.builder()
         .setSubject((userPrincipal.getUsername()))

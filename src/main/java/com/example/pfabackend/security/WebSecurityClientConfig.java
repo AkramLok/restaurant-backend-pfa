@@ -24,16 +24,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 // (securedEnabled = true,
 // jsr250Enabled = true,
 // prePostEnabled = true) // by default
-public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
-  @Autowired
-  UserDetailsServiceImpl userDetailsService;
+public class WebSecurityClientConfig { // extends WebSecurityConfigurerAdapter {
 
+  @Autowired
+  UserClientDetailsServiceImpl userClientDetailsService;
 
   @Autowired
   private AuthEntryPointJwt unauthorizedHandler;
 
   @Bean
-  public AuthTokenFilterClient authenticationJwtTokenFilter() {
+  public AuthTokenFilterClient authenticationJwtTokenFilterClient() {
     return new AuthTokenFilterClient();
   }
 
@@ -41,17 +41,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 //    authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 //  }
-  
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
-      DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-       
-      authProvider.setUserDetailsService(userDetailsService);
-      authProvider.setPasswordEncoder(passwordEncoder());
-   
-      return authProvider;
-  }
 
+  @Bean
+  public AuthenticationProvider clientUserAuthenticationProvider() {
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    authProvider.setUserDetailsService(userClientDetailsService);
+    authProvider.setPasswordEncoder(passwordEncoderClient());
+    return authProvider;
+  }
 //  @Bean
 //  @Override
 //  public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -59,12 +56,12 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //  }
   
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+  public AuthenticationManager authenticationManagerClient(AuthenticationConfiguration authConfig) throws Exception {
     return authConfig.getAuthenticationManager();
   }
 
   @Bean
-  public PasswordEncoder passwordEncoder() {
+  public PasswordEncoder passwordEncoderClient() {
     return new BCryptPasswordEncoder();
   }
 
@@ -79,22 +76,20 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //
 //    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //  }
-  
+
+
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChainClient(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
-        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeRequests(auth ->
-          auth.requestMatchers("/api/auth/**").permitAll()
-                  .requestMatchers("/api/restaurants/**").permitAll()
-              .requestMatchers("/api/test/**").permitAll()
-                  .anyRequest().authenticated()
-        );
-    http.authenticationProvider(authenticationProvider());
-    //http.authenticationProvider(clientUserAuthenticationProvider());
-    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeRequests(auth ->
+                    auth.requestMatchers("/api/auth-client/**").permitAll()
+                            .anyRequest().authenticated()
+            );
+    //http.authenticationProvider(authenticationProvider());
+    http.authenticationProvider(clientUserAuthenticationProvider());
+    http.addFilterBefore(authenticationJwtTokenFilterClient(), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
-
 }

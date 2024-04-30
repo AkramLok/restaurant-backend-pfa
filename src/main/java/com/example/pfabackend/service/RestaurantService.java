@@ -4,6 +4,7 @@ import com.example.pfabackend.entities.Restaurant;
 import com.example.pfabackend.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;

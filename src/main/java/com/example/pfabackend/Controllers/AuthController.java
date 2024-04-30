@@ -5,10 +5,17 @@ import com.example.pfabackend.payload.request.LoginRequest;
 import com.example.pfabackend.payload.request.SignupRequest;
 import com.example.pfabackend.payload.response.JwtResponse;
 import com.example.pfabackend.payload.response.MessageResponse;
+import com.example.pfabackend.repository.RoleClientRepository;
+import com.example.pfabackend.repository.RoleRepository;
+import com.example.pfabackend.repository.UserClientRepository;
 import com.example.pfabackend.repository.UserRepository;
+import com.example.pfabackend.security.jwt.JwtClientUtils;
 import com.example.pfabackend.security.jwt.JwtUtils;
+import com.example.pfabackend.security.services.UserClientDetailsImpl;
 import com.example.pfabackend.security.services.UserDetailsImpl;
+import com.example.pfabackend.service.ClientService;
 import com.example.pfabackend.service.OwnerService;
+import com.example.pfabackend.service.WaiterService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,16 +44,32 @@ public class AuthController {
   UserRepository userRepository;
 
   @Autowired
+  UserClientRepository userClientRepository;
+
+
+  @Autowired
   OwnerService ownerService;
 
   @Autowired
+  ClientService clientService;
+
+  @Autowired
+  WaiterService waiterService;
+
+  @Autowired
   RoleRepository roleRepository;
+
+  @Autowired
+  RoleClientRepository roleClientRepository;
 
   @Autowired
   PasswordEncoder encoder;
 
   @Autowired
   JwtUtils jwtUtils;
+
+  @Autowired
+  JwtClientUtils jwtClientUtils;
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -139,4 +162,5 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("User and Owner registered successfully!"));
 
   }
+
 }

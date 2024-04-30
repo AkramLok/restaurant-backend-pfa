@@ -1,5 +1,7 @@
-package com.example.pfabackend.entities;
+package com.example.pfabackend.repository;
 
+import com.example.pfabackend.entities.ERole;
+import com.example.pfabackend.entities.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
