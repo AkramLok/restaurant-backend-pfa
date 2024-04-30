@@ -5,13 +5,9 @@ import com.example.pfabackend.payload.request.LoginRequest;
 import com.example.pfabackend.payload.request.SignupRequest;
 import com.example.pfabackend.payload.response.JwtResponse;
 import com.example.pfabackend.payload.response.MessageResponse;
-import com.example.pfabackend.repository.RoleClientRepository;
 import com.example.pfabackend.repository.RoleRepository;
-import com.example.pfabackend.repository.UserClientRepository;
 import com.example.pfabackend.repository.UserRepository;
-import com.example.pfabackend.security.jwt.JwtClientUtils;
 import com.example.pfabackend.security.jwt.JwtUtils;
-import com.example.pfabackend.security.services.UserClientDetailsImpl;
 import com.example.pfabackend.security.services.UserDetailsImpl;
 import com.example.pfabackend.service.ClientService;
 import com.example.pfabackend.service.OwnerService;
@@ -43,9 +39,6 @@ public class AuthController {
   @Autowired
   UserRepository userRepository;
 
-  @Autowired
-  UserClientRepository userClientRepository;
-
 
   @Autowired
   OwnerService ownerService;
@@ -60,16 +53,11 @@ public class AuthController {
   RoleRepository roleRepository;
 
   @Autowired
-  RoleClientRepository roleClientRepository;
-
-  @Autowired
   PasswordEncoder encoder;
 
   @Autowired
   JwtUtils jwtUtils;
 
-  @Autowired
-  JwtClientUtils jwtClientUtils;
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
