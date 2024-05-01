@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
   private static final long serialVersionUID = 1L;
+  private final Long ownerId;
+  private final Long clientId;
+  private final Long waiterId;
 
   private Long id;
 
@@ -25,12 +28,15 @@ public class UserDetailsImpl implements UserDetails {
 
   private Collection<? extends GrantedAuthority> authorities;
 
-  public UserDetailsImpl(Long id, String username, String email, String password,
+  public UserDetailsImpl(Long id, String username, String email, String password, Long ownerId, Long clientId, Long waiterId,
       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.username = username;
     this.email = email;
     this.password = password;
+    this.ownerId = ownerId;
+    this.clientId = clientId;
+    this.waiterId = waiterId;
     this.authorities = authorities;
   }
 
@@ -44,12 +50,27 @@ public class UserDetailsImpl implements UserDetails {
         user.getUsername(), 
         user.getEmail(),
         user.getPassword(),
+        user.getOwnerId(),
+        user.getClientId(),
+            user.getWaiterId(),
         authorities);
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return authorities;
+  }
+
+  public Long getOwnerId() {
+    return ownerId;
+  }
+
+  public Long getClientId() {
+    return clientId;
+  }
+
+  public Long getWaiterId() {
+    return waiterId;
   }
 
   public Long getId() {

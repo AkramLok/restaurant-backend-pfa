@@ -1,5 +1,6 @@
 package com.example.pfabackend.service;
 
+import com.example.pfabackend.entities.Owner;
 import com.example.pfabackend.entities.Restaurant;
 import com.example.pfabackend.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class RestaurantService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    private OwnerService ownerService;
+
     public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAll();
     }
@@ -45,7 +49,7 @@ public class RestaurantService {
         return optionalRestaurant.orElse(null);
     }
 
-    public Restaurant createRestaurant(Restaurant restaurant, MultipartFile logoFile, MultipartFile coverFile) {
+    public void createRestaurant(Restaurant restaurant, MultipartFile logoFile, MultipartFile coverFile, String ownerId) {
         if (logoFile == null || logoFile.isEmpty()) {
             throw new IllegalArgumentException("Logo file cannot be null or empty.");
         }
@@ -68,7 +72,15 @@ public class RestaurantService {
 
         restaurant.setLogoUrl(combinedLogoFileName);
         restaurant.setCoverImageUrl(combinedCoverFileName);
-        return restaurantRepository.save(restaurant);
+        Restaurant restaurantSaved = restaurantRepository.save(restaurant);
+        Optional<Owner> optionalOwner = ownerService.getOwnerById(Long.parseLong(ownerId));
+        if (optionalOwner.isPresent()) {
+            Owner updatedOwner = optionalOwner.get();
+            updatedOwner.setRestaurant(restaurantSaved);
+            ownerService.updateOwner(Long.parseLong(ownerId), updatedOwner);
+        } else {
+            System.out.println("No owner found");
+        }
     }
 
     public Restaurant updateRestaurant(Long id, Restaurant updatedRestaurant) {

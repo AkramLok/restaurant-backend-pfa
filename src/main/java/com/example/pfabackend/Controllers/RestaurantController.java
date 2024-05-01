@@ -29,8 +29,8 @@ public class RestaurantController {
     }
 
     @PostMapping
-    public Restaurant createRestaurant(@RequestPart Restaurant restaurant, @RequestParam("logoFile") MultipartFile logoFile, @RequestParam("coverFile") MultipartFile coverFile) {
-        return restaurantService.createRestaurant(restaurant, logoFile, coverFile);
+    public void createRestaurant(@RequestPart Restaurant restaurant, @RequestParam("logoFile") MultipartFile logoFile, @RequestParam("coverFile") MultipartFile coverFile, @RequestParam("ownerId") String ownerId ) {
+        restaurantService.createRestaurant(restaurant, logoFile, coverFile, ownerId);
     }
 
     //get any image of restaurant (cover or logo) by sending get: http://localhost:8084/api/restaurants/files/<<file_name.ext>>

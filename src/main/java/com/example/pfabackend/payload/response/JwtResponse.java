@@ -3,6 +3,10 @@ package com.example.pfabackend.payload.response;
 import java.util.List;
 
 public class JwtResponse {
+  private Long ownerId;
+  private Long clientId;
+  private Long waiterId;
+
   private String token;
   private String type = "Bearer";
   private Long id;
@@ -10,11 +14,14 @@ public class JwtResponse {
   private String email;
   private List<String> roles;
 
-  public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles) {
+  public JwtResponse(String accessToken, Long id, String username, String email, Long ownerId, Long clientId, Long waiterId, List<String> roles) {
     this.token = accessToken;
     this.id = id;
     this.username = username;
     this.email = email;
+    this.ownerId = ownerId;
+    this.clientId = clientId;
+    this.waiterId = waiterId;
     this.roles = roles;
   }
 
@@ -32,6 +39,30 @@ public class JwtResponse {
 
   public void setTokenType(String tokenType) {
     this.type = tokenType;
+  }
+
+  public void setOwnerId(Long ownerId) {
+    this.ownerId = ownerId;
+  }
+
+  public void setClientId(Long clientId) {
+    this.clientId = clientId;
+  }
+
+  public void setWaiterId(Long waiterId) {
+    this.waiterId = waiterId;
+  }
+
+  public Long getOwnerId() {
+    return ownerId;
+  }
+
+  public Long getClientId() {
+    return clientId;
+  }
+
+  public Long getWaiterId() {
+    return waiterId;
   }
 
   public Long getId() {
