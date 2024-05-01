@@ -3,14 +3,35 @@ package com.example.pfabackend.service;
 import com.example.pfabackend.entities.Restaurant;
 import com.example.pfabackend.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class RestaurantService {
+
+    private final Path root = Paths.get("uploads/restaurant");
+
+    public void init() {
+        try {
+            Files.createDirectories(root);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not initialize folder for upload!");
+        }
+    }
 
     @Autowired
     private RestaurantRepository restaurantRepository;
@@ -24,7 +45,29 @@ public class RestaurantService {
         return optionalRestaurant.orElse(null);
     }
 
-    public Restaurant createRestaurant(Restaurant restaurant) {
+    public Restaurant createRestaurant(Restaurant restaurant, MultipartFile logoFile, MultipartFile coverFile) {
+        if (logoFile == null || logoFile.isEmpty()) {
+            throw new IllegalArgumentException("Logo file cannot be null or empty.");
+        }
+        if (coverFile == null || coverFile.isEmpty()) {
+            throw new IllegalArgumentException("Cover file cannot be null or empty.");
+        }
+        init();
+        String randomLogoFileName = UUID.randomUUID().toString();
+        String fileLogoExtension = StringUtils.getFilenameExtension(logoFile.getOriginalFilename());
+        String combinedLogoFileName = randomLogoFileName + "." + fileLogoExtension;
+        saveRestaurantImage(logoFile, combinedLogoFileName);
+
+        String randomCoverFileName = UUID.randomUUID().toString();
+        String fileCoverExtension = StringUtils.getFilenameExtension(coverFile.getOriginalFilename());
+        String combinedCoverFileName = randomCoverFileName + "." + fileCoverExtension;
+        saveRestaurantImage(coverFile, combinedCoverFileName);
+
+        System.out.println("Restaurant Created !");
+        System.out.println("email: "+restaurant.getEmail()+" ,desc: "+restaurant.getDescription()+" , id: "+ restaurant.getId());
+
+        restaurant.setLogoUrl(combinedLogoFileName);
+        restaurant.setCoverImageUrl(combinedCoverFileName);
         return restaurantRepository.save(restaurant);
     }
 
@@ -81,7 +124,31 @@ public class RestaurantService {
         }
     }
 
+    public void saveRestaurantImage(MultipartFile file, String filename) {
+        try {
+            Files.copy(file.getInputStream(), this.root.resolve(filename));
+        } catch (Exception e) {
+            if (e instanceof FileAlreadyExistsException) {
+                throw new RuntimeException("A file of that name already exists.");
+            }
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
+    public Resource load(String filename) {
+        try {
+            Path file = root.resolve(filename);
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
 
     public void deleteRestaurant(Long id) {
         restaurantRepository.deleteById(id);

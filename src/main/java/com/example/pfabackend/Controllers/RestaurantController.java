@@ -3,7 +3,11 @@ package com.example.pfabackend.Controllers;
 import com.example.pfabackend.entities.Restaurant;
 import com.example.pfabackend.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,8 +29,16 @@ public class RestaurantController {
     }
 
     @PostMapping
-    public Restaurant createRestaurant(@RequestBody Restaurant restaurant) {
-        return restaurantService.createRestaurant(restaurant);
+    public Restaurant createRestaurant(@RequestPart Restaurant restaurant, @RequestParam("logoFile") MultipartFile logoFile, @RequestParam("coverFile") MultipartFile coverFile) {
+        return restaurantService.createRestaurant(restaurant, logoFile, coverFile);
+    }
+
+    //get any image of restaurant (cover or logo) by sending get: http://localhost:8084/api/restaurants/files/<<file_name.ext>>
+    @GetMapping(value = "/files/{filename:[a-zA-Z0-9._-]+}")
+    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+        Resource file = restaurantService.load(filename);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
     @PutMapping("/{id}")
