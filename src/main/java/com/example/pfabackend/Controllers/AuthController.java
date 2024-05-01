@@ -11,6 +11,7 @@ import com.example.pfabackend.security.jwt.JwtUtils;
 import com.example.pfabackend.security.services.UserDetailsImpl;
 import com.example.pfabackend.service.ClientService;
 import com.example.pfabackend.service.OwnerService;
+import com.example.pfabackend.service.RestaurantService;
 import com.example.pfabackend.service.WaiterService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -40,6 +41,9 @@ public class AuthController {
 
   @Autowired
   UserRepository userRepository;
+
+  @Autowired
+  RestaurantService restaurantService;
 
 
   @Autowired
@@ -227,7 +231,7 @@ public class AuthController {
                   signUpRequest.getEmail(),
                   null
           );
-          Waiter savedWaiter = waiterService.createWaiterForRestaurant(null,waiter);
+          Waiter savedWaiter = waiterService.createWaiterForRestaurant(signUpRequest.getRestaurantId(),waiter);
           userType.set("Waiter");
           user.setWaiterId(savedWaiter.getId());
 
