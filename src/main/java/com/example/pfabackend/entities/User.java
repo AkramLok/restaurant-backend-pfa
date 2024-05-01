@@ -32,6 +32,10 @@ public class User {
   @Size(max = 120)
   private String password;
 
+  private Long ownerId;
+  private Long clientId;
+  private Long waiterId;
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(  name = "user_roles", 
         joinColumns = @JoinColumn(name = "user_id"), 
@@ -45,6 +49,30 @@ public class User {
     this.username = username;
     this.email = email;
     this.password = password;
+  }
+
+  public Long getOwnerId() {
+    return ownerId;
+  }
+
+  public void setOwnerId(Long ownerId) {
+    this.ownerId = ownerId;
+  }
+
+  public Long getClientId() {
+    return clientId;
+  }
+
+  public void setClientId(Long clientId) {
+    this.clientId = clientId;
+  }
+
+  public Long getWaiterId() {
+    return waiterId;
+  }
+
+  public void setWaiterId(Long waiterId) {
+    this.waiterId = waiterId;
   }
 
   public Long getId() {

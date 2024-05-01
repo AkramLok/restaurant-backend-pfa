@@ -12,6 +12,7 @@ import com.example.pfabackend.security.services.UserDetailsImpl;
 import com.example.pfabackend.service.ClientService;
 import com.example.pfabackend.service.OwnerService;
 import com.example.pfabackend.service.WaiterService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -67,19 +69,91 @@ public class AuthController {
 
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    String jwt = jwtUtils.generateJwtToken(authentication);
-    
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    List<String> roles = userDetails.getAuthorities().stream()
-        .map(item -> item.getAuthority())
-        .collect(Collectors.toList());
-      return ResponseEntity.ok(new JwtResponse(jwt,
-              userDetails.getId(),
-              userDetails.getUsername(),
-              userDetails.getEmail()
-              , roles
-      ));
 
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+      // Check if the user's role is not ROLE_ADMIN
+      if (userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"))) {
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles
+        ));
+      } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Account role must be owner not client or waiter."));
+      }
+    } catch (AuthenticationException e) {
+
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Invalid username or password"));
+    }
+  }
+
+
+  @PostMapping("/client/signin")
+  public ResponseEntity<?> authenticateClient(@Valid @RequestBody LoginRequest loginRequest) {
+    try {
+      Authentication authentication = authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+
+      UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+      if (userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_USER"))) {
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles
+        ));
+      } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Account role must be client not owner or waiter."));
+      }
+    } catch (AuthenticationException e) {
+
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Invalid username or password"));
+    }
+  }
+
+
+  @PostMapping("/waiter/signin")
+  public ResponseEntity<?> authenticateWaiter(@Valid @RequestBody LoginRequest loginRequest) {
+    try {
+      Authentication authentication = authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+
+      UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+      if (userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_MODERATOR"))) {
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles
+        ));
+      } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Account role must be waiter not owner or client."));
+      }
     } catch (AuthenticationException e) {
 
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Invalid username or password"));
@@ -106,11 +180,23 @@ public class AuthController {
 
     Set<String> strRoles = signUpRequest.getRole();
     Set<Role> roles = new HashSet<>();
-
+    AtomicReference<String> userType= new AtomicReference<>("");
     if (strRoles == null) {
       Role userRole = roleRepository.findByName(ERole.ROLE_USER)
           .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
       roles.add(userRole);
+      Client client = new Client(
+              null,
+              signUpRequest.getName(),
+              signUpRequest.getEmail(),
+              signUpRequest.getPhone(),
+              null,
+              null
+      );
+      Client savedClient = clientService.createClient(client);
+      userType.set("Client");
+      user.setRoles(roles);
+      user.setClientId(savedClient.getId());
     } else {
       strRoles.forEach(role -> {
         switch (role) {
@@ -118,18 +204,49 @@ public class AuthController {
           Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
               .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
           roles.add(adminRole);
-
+          Owner owner = new Owner(
+                  null,
+                  signUpRequest.getName(),
+                  signUpRequest.getEmail(),
+                  signUpRequest.getPhone(),
+                  null
+          );
+          Owner savedOwner = ownerService.createOwner(owner);
+          userType.set("ADMIN");
+          user.setOwnerId(savedOwner.getId());
           break;
         case "mod":
           Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
               .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
           roles.add(modRole);
+          Waiter waiter = new Waiter(
+                  null,
+                  signUpRequest.getName(),
+                  null,
+                  signUpRequest.getPhone(),
+                  signUpRequest.getEmail(),
+                  null
+          );
+          Waiter savedWaiter = waiterService.createWaiterForRestaurant(null,waiter);
+          userType.set("Waiter");
+          user.setWaiterId(savedWaiter.getId());
 
           break;
         default:
           Role userRole = roleRepository.findByName(ERole.ROLE_USER)
               .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
           roles.add(userRole);
+          Client client = new Client(
+                  null,
+                  signUpRequest.getName(),
+                  signUpRequest.getEmail(),
+                  signUpRequest.getPhone(),
+                  null,
+                  null
+          );
+          Client savedClient = clientService.createClient(client);
+          userType.set("Client");
+          user.setClientId(savedClient.getId());
         }
       });
 
@@ -138,17 +255,14 @@ public class AuthController {
     }
 
     userRepository.save(user);
+    return ResponseEntity.ok(new MessageResponse("User of type : "+ userType.get() +" registered successfully!"));
 
-    Owner owner = new Owner(
-            null,
-            signUpRequest.getName(),
-            signUpRequest.getEmail(),
-            signUpRequest.getPhone(),
-            null
-    );
-    ownerService.createOwner(owner);
-    return ResponseEntity.ok(new MessageResponse("User and Owner registered successfully!"));
+  }
 
+  @PostMapping("/logout")
+  public ResponseEntity<?> logout(HttpServletRequest request) {
+    SecurityContextHolder.clearContext();
+    return ResponseEntity.ok(new MessageResponse("Logout successful"));
   }
 
 }

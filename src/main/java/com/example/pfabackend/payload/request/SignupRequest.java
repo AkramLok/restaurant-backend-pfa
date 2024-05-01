@@ -31,6 +31,26 @@ public class SignupRequest {
   @Size(max=50)
   private String phone;
 
+  @Size(max=50)
+  private String cin;
+
+  private Long restaurantId;
+
+  public String getCin() {
+    return cin;
+  }
+
+  public void setCin(String cin) {
+    this.cin = cin;
+  }
+
+  public Long getRestaurantId() {
+    return restaurantId;
+  }
+
+  public void setRestaurantId(Long restaurantId) {
+    this.restaurantId = restaurantId;
+  }
 
   public String getName() {
     return name;
