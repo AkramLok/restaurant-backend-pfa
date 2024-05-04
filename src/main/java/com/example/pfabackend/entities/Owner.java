@@ -26,7 +26,7 @@ public class Owner {
     @Column(name = "phone")
     private String phone;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_id")
     @JsonIgnore
     private Restaurant restaurant;

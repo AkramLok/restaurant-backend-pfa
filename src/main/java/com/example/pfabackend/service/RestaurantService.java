@@ -1,6 +1,8 @@
 package com.example.pfabackend.service;
 
+import com.example.pfabackend.entities.Owner;
 import com.example.pfabackend.entities.Restaurant;
+import com.example.pfabackend.repository.OwnerRepository;
 import com.example.pfabackend.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -36,6 +38,9 @@ public class RestaurantService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    private OwnerService ownerService;
+
     public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAll();
     }
@@ -45,7 +50,7 @@ public class RestaurantService {
         return optionalRestaurant.orElse(null);
     }
 
-    public Restaurant createRestaurant(Restaurant restaurant, MultipartFile logoFile, MultipartFile coverFile) {
+    public void createRestaurant(Restaurant restaurant, MultipartFile logoFile, MultipartFile coverFile, String ownerId) {
         if (logoFile == null || logoFile.isEmpty()) {
             throw new IllegalArgumentException("Logo file cannot be null or empty.");
         }
@@ -68,7 +73,17 @@ public class RestaurantService {
 
         restaurant.setLogoUrl(combinedLogoFileName);
         restaurant.setCoverImageUrl(combinedCoverFileName);
-        return restaurantRepository.save(restaurant);
+
+        Restaurant restaurantSaved = restaurantRepository.save(restaurant);
+
+        Optional<Owner> optionalOwner = ownerService.getOwnerById(Long.parseLong(ownerId));
+        Owner owner = optionalOwner.orElse(null);
+        if (owner != null) {
+            owner.setRestaurant(restaurantSaved);
+            ownerService.updateOwner(Long.parseLong(ownerId), owner);
+        } else {
+            System.out.println("No owner found");
+        }
     }
 
     public Restaurant updateRestaurant(Long id, Restaurant updatedRestaurant) {
@@ -152,5 +167,17 @@ public class RestaurantService {
 
     public void deleteRestaurant(Long id) {
         restaurantRepository.deleteById(id);
+    }
+
+    public Restaurant getRestaurantByOwnerId(Long id) {
+        Optional<Owner> optionalOwner = ownerService.getOwnerById(id);
+        if(optionalOwner.isPresent()) {
+            Owner owner = optionalOwner.get();
+            Restaurant restaurant = owner.getRestaurant();
+            return restaurant;
+        }
+        else{
+            return null;
+        }
     }
 }
