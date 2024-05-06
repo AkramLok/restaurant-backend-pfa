@@ -51,12 +51,6 @@ public class RestaurantService {
     }
 
     public void createRestaurant(Restaurant restaurant, MultipartFile logoFile, MultipartFile coverFile, String ownerId) {
-        if (logoFile == null || logoFile.isEmpty()) {
-            throw new IllegalArgumentException("Logo file cannot be null or empty.");
-        }
-        if (coverFile == null || coverFile.isEmpty()) {
-            throw new IllegalArgumentException("Cover file cannot be null or empty.");
-        }
         init();
         String randomLogoFileName = UUID.randomUUID().toString();
         String fileLogoExtension = StringUtils.getFilenameExtension(logoFile.getOriginalFilename());
@@ -69,7 +63,7 @@ public class RestaurantService {
         saveRestaurantImage(coverFile, combinedCoverFileName);
 
         System.out.println("Restaurant Created !");
-        System.out.println("email: "+restaurant.getEmail()+" ,desc: "+restaurant.getDescription()+" , id: "+ restaurant.getId());
+        System.out.println("Email: "+restaurant.getEmail()+" ,desc: "+restaurant.getDescription()+" , id: "+ restaurant.getId());
 
         restaurant.setLogoUrl(combinedLogoFileName);
         restaurant.setCoverImageUrl(combinedCoverFileName);

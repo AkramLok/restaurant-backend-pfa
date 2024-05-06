@@ -6,9 +6,11 @@ import com.example.pfabackend.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -37,6 +39,12 @@ public class RestaurantController {
 
     @PostMapping
     public ResponseEntity<?> createRestaurant(@RequestPart Restaurant restaurant, @RequestParam("logoFile") MultipartFile logoFile, @RequestParam("coverFile") MultipartFile coverFile, @RequestParam("ownerId") String ownerId ) {
+        if (logoFile == null || logoFile.isEmpty()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Logo file is empty !"));
+        }
+        if (coverFile == null || coverFile.isEmpty()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Cover file is empty !"));
+        }
         restaurantService.createRestaurant(restaurant, logoFile, coverFile, ownerId);
         return ResponseEntity.ok(new MessageResponse("Restaurant created successfully!"));
     }

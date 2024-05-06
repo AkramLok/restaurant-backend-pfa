@@ -2,11 +2,13 @@ package com.example.pfabackend.service;
 
 import com.example.pfabackend.entities.FoodCategory;
 import com.example.pfabackend.entities.Product;
+import com.example.pfabackend.payload.response.MessageResponse;
 import com.example.pfabackend.repository.FoodCategoryRepository;
 import com.example.pfabackend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -131,11 +134,16 @@ public class ProductService {
         }
     }
 
-    public void deleteProduct(Long id) {
-        if (productRepository.existsById(id)) {
-            productRepository.deleteById(id);
+    public ResponseEntity<?> deleteProduct(Long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            String nameProductDeleted = product.getName();
+            productRepository.delete(product);
+            return ResponseEntity.ok(new MessageResponse("Product of name "+ nameProductDeleted +" deleted successfully !"));
         } else {
-            throw new IllegalArgumentException("Product with ID " + id + " not found.");
+            return ResponseEntity.ok(new MessageResponse("Product with ID " + id + " not found."));
         }
     }
+
 }
