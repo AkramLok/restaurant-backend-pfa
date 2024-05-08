@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/reward")
+@RequestMapping("/api/reward")
 public class RewardController {
     private final RewardService rewardService;
     @Autowired
@@ -29,14 +29,14 @@ public class RewardController {
         return ResponseEntity.ok(rewards);
     }
 
-    @GetMapping("/productId/{productId}")
+    @GetMapping("/product/{productId}")
     public ResponseEntity<Reward> getRewardByProductId(@PathVariable Long productId) {
         Optional<Reward> reward = rewardService.getRewardByProductId(productId);
         return reward.map(value -> ResponseEntity.ok().body(value))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/productId/{productId}")
+    @PostMapping("/product/{productId}")
     public ResponseEntity<Reward> createOrUpdateReward(@PathVariable Long productId, @RequestBody Reward reward) {
         Reward createdReward = rewardService.createOrUpdateReward(productId, reward);
         if (createdReward != null) {

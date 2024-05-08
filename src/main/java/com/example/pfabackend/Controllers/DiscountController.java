@@ -10,15 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/discount")
+@RequestMapping("/api/discount")
 public class DiscountController {
 
 
     @Autowired
     private  DiscountService discountService;
-
-
-
 
     @GetMapping
     public ResponseEntity<List<Discount>> getAllDiscounts() {
@@ -32,13 +29,13 @@ public class DiscountController {
         return ResponseEntity.ok(discounts);
     }
 
-    @GetMapping("/{productId}")
+    @GetMapping("/product/{productId}")
     public ResponseEntity<Discount> getDiscountByProductId(@PathVariable Long productId) {
         Discount discount = discountService.getDiscountByProductId(productId);
         return ResponseEntity.ok(discount);
     }
 
-    @PostMapping("/productId/{productId}")
+    @PostMapping("/product/{productId}")
     public ResponseEntity<Discount> createOrUpdateDiscount(@PathVariable Long productId, @RequestBody Discount discount) {
         Discount createdOrUpdatedDiscount = discountService.createOrUpdateDiscount(productId, discount);
         return new ResponseEntity<>(createdOrUpdatedDiscount, HttpStatus.CREATED);
