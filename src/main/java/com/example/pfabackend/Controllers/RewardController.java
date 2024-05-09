@@ -1,6 +1,7 @@
 package com.example.pfabackend.Controllers;
 
 import com.example.pfabackend.entities.Reward;
+import com.example.pfabackend.payload.response.MessageResponse;
 import com.example.pfabackend.service.RewardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,12 +38,22 @@ public class RewardController {
     }
 
     @PostMapping("/product/{productId}")
-    public ResponseEntity<Reward> createOrUpdateReward(@PathVariable Long productId, @RequestBody Reward reward) {
+    public ResponseEntity<?> createOrUpdateReward(@PathVariable Long productId, @RequestBody Reward reward) {
         Reward createdReward = rewardService.createOrUpdateReward(productId, reward);
         if (createdReward != null) {
-            return ResponseEntity.ok(createdReward);
+            return ResponseEntity.ok(new MessageResponse("Reward of number of points "+ createdReward.getRequiredPoints() +" created successfully of the product "+ createdReward.getProduct().getName()));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Reward is empty !!!"));
+        }
+    }
+
+    @PutMapping("/product/{productId}")
+    public ResponseEntity<?> UpdateReward(@PathVariable Long productId, @RequestBody Reward reward) {
+        Reward updatedReward = rewardService.createOrUpdateReward(productId, reward);
+        if (updatedReward != null) {
+            return ResponseEntity.ok(new MessageResponse("Reward of number of points "+ updatedReward.getRequiredPoints() +" updated successfully of the product "+ updatedReward.getProduct().getName()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Reward is empty !!!"));
         }
     }
 

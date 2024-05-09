@@ -45,9 +45,8 @@ public class FoodCategoryService {
             if (existingCategory.isPresent()) {
                 throw new IllegalArgumentException("Category with name " + foodCategory.getName() + " already exists for restaurant with ID " + restaurantId);
             }
-            // Set the restaurant for the food category
             foodCategory.setRestaurant(optionalRestaurant.get());
-            // Save the food category
+            foodCategory.setIsActivated(true);
             return foodCategoryRepository.save(foodCategory);
         } else {
             // Handle the case where the restaurant ID is not found

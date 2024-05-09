@@ -32,6 +32,9 @@ public class Product {
     @Column(name = "img")
     private String img;
 
+    @Column(name = "isActivated")
+    private Boolean isActivated;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     @JsonIgnore

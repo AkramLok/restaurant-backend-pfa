@@ -46,7 +46,7 @@ public class RestaurantController {
             return ResponseEntity.badRequest().body(new MessageResponse("Cover file is empty !"));
         }
         restaurantService.createRestaurant(restaurant, logoFile, coverFile, ownerId);
-        return ResponseEntity.ok(new MessageResponse("Restaurant created successfully!"));
+        return ResponseEntity.ok(new MessageResponse("Restaurant created successfully! Check Menu or Rewards!"));
     }
 
     //get any image of restaurant (cover or logo) by sending get: http://localhost:8084/api/restaurants/files/<<file_name.ext>>

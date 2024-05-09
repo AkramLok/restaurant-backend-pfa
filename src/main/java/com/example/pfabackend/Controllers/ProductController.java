@@ -33,6 +33,12 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/activated")
+    public ResponseEntity<List<Product>> getAllActivatedProducts() {
+        List<Product> activatedProducts = productService.getActivatedProducts();
+        return ResponseEntity.ok(activatedProducts);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         return productService.getProductById(id)
@@ -44,6 +50,12 @@ public class ProductController {
     public ResponseEntity<?> createProduct(@PathVariable Long categoryId, @RequestPart Product product, @RequestParam("productFile") MultipartFile productFile) {
         Product createdProduct = productService.createProduct(categoryId, product, productFile);
         return ResponseEntity.ok(new MessageResponse("Product of name "+ product.getName() +" created successfully of the category "+ foodCategoryService.getFoodCategoryById(categoryId).get().getName()));
+    }
+
+    @PutMapping("/{productId}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestPart Product product, @RequestParam("productFile") MultipartFile productFile) {
+        Product createdProduct = productService.updateProduct(productId, product, productFile);
+        return ResponseEntity.ok(new MessageResponse("Product of name "+ product.getName() +" updated successfully of the category "+productService.getProductById(productId).get().getCategory().getName()));
     }
 
     @GetMapping(value = "/files/{filename:[a-zA-Z0-9._-]+}")
@@ -58,6 +70,26 @@ public class ProductController {
         List<Product> products = productService.getProductsByCategoryId(categoryId);
         return ResponseEntity.ok(products);
     }
+
+    @GetMapping("/foodCategory/{categoryId}/activated")
+    public ResponseEntity<List<Product>> getActivatedProductsByCategoryId(@PathVariable Long categoryId) {
+        List<Product> activatedProducts = productService.getActivatedProductsByCategoryId(categoryId);
+        return ResponseEntity.ok(activatedProducts);
+    }
+
+    @PutMapping("/{productId}/deactivate")
+    public ResponseEntity<String> deactivateProduct(@PathVariable Long productId) {
+        productService.deactivateProduct(productId);
+        return ResponseEntity.ok("Product "+ productService.getProductById(productId).get().getName() +" deactivated successfully !");
+    }
+
+    @PutMapping("/{productId}/activate")
+    public ResponseEntity<String> activateProduct(@PathVariable Long productId) {
+        productService.activateProduct(productId);
+        return ResponseEntity.ok("Product "+ productService.getProductById(productId).get().getName() +" activated back successfully !");
+    }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {

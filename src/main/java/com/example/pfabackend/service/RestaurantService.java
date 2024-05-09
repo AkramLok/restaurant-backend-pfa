@@ -67,7 +67,8 @@ public class RestaurantService {
 
         restaurant.setLogoUrl(combinedLogoFileName);
         restaurant.setCoverImageUrl(combinedCoverFileName);
-
+        restaurant.setLikes(0);
+        restaurant.setRating(0);
         Restaurant restaurantSaved = restaurantRepository.save(restaurant);
 
         Optional<Owner> optionalOwner = ownerService.getOwnerById(Long.parseLong(ownerId));

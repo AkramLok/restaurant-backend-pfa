@@ -50,6 +50,36 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public List<Product> getActivatedProducts() {
+        return productRepository.findActivatedProducts();
+    }
+
+    public List<Product> getActivatedProductsByCategoryId(Long categoryId) {
+        return productRepository.findByCategory_IdAndIsActivated(categoryId, true);
+    }
+    public void deactivateProduct(Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            product.setIsActivated(false); // Set isActivated to false
+            productRepository.save(product); // Save the updated product
+        } else {
+            throw new RuntimeException("Product not found with id: " + productId);
+        }
+    }
+
+    public void activateProduct(Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            product.setIsActivated(true); // Set isActivated to false
+            productRepository.save(product); // Save the updated product
+        } else {
+            throw new RuntimeException("Product not found with id: " + productId);
+        }
+    }
+
+
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
@@ -61,15 +91,16 @@ public class ProductService {
                 throw new IllegalArgumentException("Product file cannot be null or empty.");
             }
             init();
-            String randomLogoFileName = UUID.randomUUID().toString();
-            String fileLogoExtension = StringUtils.getFilenameExtension(productFile.getOriginalFilename());
-            String combinedLogoFileName = randomLogoFileName + "." + fileLogoExtension;
-            saveProductImage(productFile, combinedLogoFileName);
+            String randomProductFileName = UUID.randomUUID().toString();
+            String fileProductExtension = StringUtils.getFilenameExtension(productFile.getOriginalFilename());
+            String combinedProductFileName = randomProductFileName + "." + fileProductExtension;
+            saveProductImage(productFile, combinedProductFileName);
             System.out.println("Product Created !");
             System.out.println("Name: "+product.getName()+" ,info: "+product.getInfo()+" , id: "+ product.getId());
-            product.setImg(combinedLogoFileName);
+            product.setImg(combinedProductFileName);
             FoodCategory category = categoryOptional.get();
             product.setCategory(category);
+            product.setIsActivated(true);
             return productRepository.save(product);
         } else {
             throw new IllegalArgumentException("Food category with ID " + categoryId + " not found.");
@@ -80,7 +111,7 @@ public class ProductService {
         return productRepository.findByCategory_Id(categoryId);
     }
 
-    public Product updateProduct(Long id, Product updatedProduct) {
+    public Product updateProduct(Long id, Product updatedProduct, MultipartFile productFile) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
@@ -98,10 +129,18 @@ public class ProductService {
                 product.setInfo(updatedProduct.getInfo());
             }
             if (updatedProduct.getImg() != null) {
-                product.setImg(updatedProduct.getImg());
+                if (productFile == null || productFile.isEmpty()) {
+                    throw new IllegalArgumentException("Product file cannot be null or empty.");
+                }
+                init();
+                String randomProductFileName = UUID.randomUUID().toString();
+                String fileProductExtension = StringUtils.getFilenameExtension(productFile.getOriginalFilename());
+                String combinedProductFileName = randomProductFileName + "." + fileProductExtension;
+                saveProductImage(productFile, combinedProductFileName);
+                System.out.println("Product Created !");
+                System.out.println("Name: " + product.getName() + " ,info: " + product.getInfo() + " , id: " + product.getId());
+                product.setImg(combinedProductFileName);
             }
-            // Update other fields as needed
-
             return productRepository.save(product);
         } else {
             throw new IllegalArgumentException("Product with ID " + id + " not found.");

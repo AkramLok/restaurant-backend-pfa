@@ -1,6 +1,7 @@
 package com.example.pfabackend.Controllers;
 
 import com.example.pfabackend.entities.Discount;
+import com.example.pfabackend.payload.response.MessageResponse;
 import com.example.pfabackend.service.DiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,15 +37,23 @@ public class DiscountController {
     }
 
     @PostMapping("/product/{productId}")
-    public ResponseEntity<Discount> createOrUpdateDiscount(@PathVariable Long productId, @RequestBody Discount discount) {
+    public ResponseEntity<?> createOrUpdateDiscount(@PathVariable Long productId, @RequestBody Discount discount) {
         Discount createdOrUpdatedDiscount = discountService.createOrUpdateDiscount(productId, discount);
-        return new ResponseEntity<>(createdOrUpdatedDiscount, HttpStatus.CREATED);
+        if (createdOrUpdatedDiscount != null) {
+            return ResponseEntity.ok(new MessageResponse("Discount of percentage: "+ createdOrUpdatedDiscount.getDiscountPercentage() +" %, created successfully of the product "+ createdOrUpdatedDiscount.getProduct().getName()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Discount is empty !!!"));
+        }
     }
 
-    @PutMapping("/{discountId}")
-    public ResponseEntity<Discount> updateDiscount(@PathVariable Long discountId, @RequestBody Discount discount) {
+    @PutMapping("/product/{discountId}")
+    public ResponseEntity<?> updateDiscount(@PathVariable Long discountId, @RequestBody Discount discount) {
         Discount updatedDiscount = discountService.updateDiscount(discountId, discount);
-        return ResponseEntity.ok(updatedDiscount);
+        if (updatedDiscount != null) {
+            return ResponseEntity.ok(new MessageResponse("Discount of percentage: "+ updatedDiscount.getDiscountPercentage() +" %, updated successfully of the product "+ updatedDiscount.getProduct().getName()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Discount is empty !!!"));
+        }
     }
 
     @DeleteMapping("/{discountId}")
