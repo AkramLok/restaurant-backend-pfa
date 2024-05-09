@@ -128,19 +128,17 @@ public class ProductService {
             if (updatedProduct.getInfo() != null) {
                 product.setInfo(updatedProduct.getInfo());
             }
-            if (updatedProduct.getImg() != null) {
-                if (productFile == null || productFile.isEmpty()) {
-                    throw new IllegalArgumentException("Product file cannot be null or empty.");
-                }
-                init();
-                String randomProductFileName = UUID.randomUUID().toString();
-                String fileProductExtension = StringUtils.getFilenameExtension(productFile.getOriginalFilename());
-                String combinedProductFileName = randomProductFileName + "." + fileProductExtension;
-                saveProductImage(productFile, combinedProductFileName);
-                System.out.println("Product Created !");
-                System.out.println("Name: " + product.getName() + " ,info: " + product.getInfo() + " , id: " + product.getId());
-                product.setImg(combinedProductFileName);
+            if (productFile == null || productFile.isEmpty()) {
+                throw new IllegalArgumentException("Product file cannot be null or empty.");
             }
+            init();
+            String randomProductFileName = UUID.randomUUID().toString();
+            String fileProductExtension = StringUtils.getFilenameExtension(productFile.getOriginalFilename());
+            String combinedProductFileName = randomProductFileName + "." + fileProductExtension;
+            saveProductImage(productFile, combinedProductFileName);
+            System.out.println("Product Created !");
+            System.out.println("Name: " + product.getName() + " ,info: " + product.getInfo() + " , id: " + product.getId());
+            product.setImg(combinedProductFileName);
             return productRepository.save(product);
         } else {
             throw new IllegalArgumentException("Product with ID " + id + " not found.");

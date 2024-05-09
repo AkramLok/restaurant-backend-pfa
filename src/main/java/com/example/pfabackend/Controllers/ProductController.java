@@ -49,13 +49,13 @@ public class ProductController {
     @PostMapping("/foodCategory/{categoryId}")
     public ResponseEntity<?> createProduct(@PathVariable Long categoryId, @RequestPart Product product, @RequestParam("productFile") MultipartFile productFile) {
         Product createdProduct = productService.createProduct(categoryId, product, productFile);
-        return ResponseEntity.ok(new MessageResponse("Product of name "+ product.getName() +" created successfully of the category "+ foodCategoryService.getFoodCategoryById(categoryId).get().getName()));
+        return ResponseEntity.ok(new MessageResponse("Product of name "+ createdProduct.getName() +" created successfully of the category "+ foodCategoryService.getFoodCategoryById(categoryId).get().getName()));
     }
 
     @PutMapping("/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestPart Product product, @RequestParam("productFile") MultipartFile productFile) {
-        Product createdProduct = productService.updateProduct(productId, product, productFile);
-        return ResponseEntity.ok(new MessageResponse("Product of name "+ product.getName() +" updated successfully of the category "+productService.getProductById(productId).get().getCategory().getName()));
+        Product updatedProduct = productService.updateProduct(productId, product, productFile);
+        return ResponseEntity.ok(new MessageResponse("Product of name "+ updatedProduct.getName() +" updated successfully of the category "+productService.getProductById(productId).get().getCategory().getName()));
     }
 
     @GetMapping(value = "/files/{filename:[a-zA-Z0-9._-]+}")
