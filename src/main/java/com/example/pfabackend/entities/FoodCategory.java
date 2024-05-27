@@ -31,6 +31,8 @@ public class FoodCategory {
     @JsonIgnore
     private Restaurant restaurant;
 
+    @Column(name = "isActivated")
+    private Boolean isActivated;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Product> products = new ArrayList<>();

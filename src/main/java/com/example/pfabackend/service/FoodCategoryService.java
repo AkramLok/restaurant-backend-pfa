@@ -4,10 +4,12 @@ import com.example.pfabackend.entities.FoodCategory;
 import com.example.pfabackend.entities.Restaurant;
 import com.example.pfabackend.repository.FoodCategoryRepository;
 import com.example.pfabackend.repository.RestaurantRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -18,6 +20,9 @@ public class FoodCategoryService {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private ProductService productService;
 
     public List<FoodCategory> getAllFoodCategories() {
         return foodCategoryRepository.findAll();
@@ -40,9 +45,8 @@ public class FoodCategoryService {
             if (existingCategory.isPresent()) {
                 throw new IllegalArgumentException("Category with name " + foodCategory.getName() + " already exists for restaurant with ID " + restaurantId);
             }
-            // Set the restaurant for the food category
             foodCategory.setRestaurant(optionalRestaurant.get());
-            // Save the food category
+            foodCategory.setIsActivated(true);
             return foodCategoryRepository.save(foodCategory);
         } else {
             // Handle the case where the restaurant ID is not found
@@ -51,7 +55,15 @@ public class FoodCategoryService {
     }
 
 
-    public void deleteFoodCategory(Long id) {
-        foodCategoryRepository.deleteById(id);
+    @Transactional
+    public void deleteFoodCategory(Long categoryId) {
+        FoodCategory category = foodCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NoSuchElementException("Category not found with id: " + categoryId));
+
+        // Delete associated products individually by passing their IDs
+        category.getProducts().forEach(product -> productService.deleteProduct(product.getId()));
+
+        // Finally, delete the category itself
+        foodCategoryRepository.delete(category);
     }
 }

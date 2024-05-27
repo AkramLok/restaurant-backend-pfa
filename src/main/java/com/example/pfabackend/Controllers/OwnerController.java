@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/owners")
+@RequestMapping("/api/owner")
 public class OwnerController {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
 
     private final OwnerService ownerService;
 
@@ -47,8 +48,8 @@ public class OwnerController {
     @PostMapping("/restaurant/{restaurantId}")
     public ResponseEntity<Owner> createOwner(@PathVariable Long restaurantId, @RequestBody Owner owner) {
 
-        Optional<Restaurant> resturant= restaurantRepository.findById(restaurantId);
-        owner.setRestaurant(resturant.get()); // Assuming there's a constructor in Restaurant class that accepts restaurantId
+        Optional<Restaurant> restaurant= restaurantRepository.findById(restaurantId);
+        owner.setRestaurant(restaurant.get());
         Owner createdOwner = ownerService.createOwner(owner);
         return new ResponseEntity<>(createdOwner, HttpStatus.CREATED);
     }

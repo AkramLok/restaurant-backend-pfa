@@ -1,7 +1,9 @@
 package com.example.pfabackend.Controllers;
 
 import com.example.pfabackend.entities.FoodCategory;
+import com.example.pfabackend.payload.response.MessageResponse;
 import com.example.pfabackend.service.FoodCategoryService;
+import com.example.pfabackend.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/food-categories")
+@RequestMapping("/api/food-categories")
 public class FoodCategoryController {
 
     private final FoodCategoryService foodCategoryService;
+    @Autowired
+    private RestaurantService restaurantService;
 
     @Autowired
     public FoodCategoryController(FoodCategoryService foodCategoryService) {
@@ -40,10 +44,10 @@ public class FoodCategoryController {
     }
 
     @PostMapping("/{restaurantId}")
-    public ResponseEntity<FoodCategory> createFoodCategory(@PathVariable Long restaurantId,
+    public ResponseEntity<?> createFoodCategory(@PathVariable Long restaurantId,
                                                            @RequestBody FoodCategory foodCategory) {
         FoodCategory createdCategory = foodCategoryService.saveFoodCategory(restaurantId, foodCategory);
-        return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
+        return ResponseEntity.ok(new MessageResponse("Category created successfully in restaurant "+restaurantService.getRestaurantById(restaurantId).getName()));
     }
 
     @DeleteMapping("/{id}")
