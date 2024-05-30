@@ -49,6 +49,13 @@ public class RestaurantController {
         return ResponseEntity.ok(new MessageResponse("Restaurant created successfully! Check Menu or Rewards!"));
     }
 
+
+    @PutMapping
+    public ResponseEntity<?> updateRestaurant(@RequestPart Restaurant restaurant, @RequestParam("logoFile") MultipartFile logoFile, @RequestParam("coverFile") MultipartFile coverFile, @RequestParam("restaurantId") String restaurantId ) {
+        restaurantService.updateRestaurant(Long.parseLong(restaurantId), logoFile, coverFile, restaurant);
+        return ResponseEntity.ok(new MessageResponse("Restaurant updated successfully!"));
+    }
+
     //get any image of restaurant (cover or logo) by sending get: http://localhost:8084/api/restaurants/files/<<file_name.ext>>
     @GetMapping(value = "/files/{filename:[a-zA-Z0-9._-]+}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename) {
@@ -57,10 +64,6 @@ public class RestaurantController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @PutMapping("/{id}")
-    public Restaurant updateRestaurant(@PathVariable Long id, @RequestBody Restaurant updatedRestaurant) {
-        return restaurantService.updateRestaurant(id, updatedRestaurant);
-    }
 
     @DeleteMapping("/{id}")
     public void deleteRestaurant(@PathVariable Long id) {

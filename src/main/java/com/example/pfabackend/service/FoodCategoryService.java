@@ -4,6 +4,7 @@ import com.example.pfabackend.entities.FoodCategory;
 import com.example.pfabackend.entities.Restaurant;
 import com.example.pfabackend.repository.FoodCategoryRepository;
 import com.example.pfabackend.repository.RestaurantRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,14 @@ public class FoodCategoryService {
             // Handle the case where the restaurant ID is not found
             throw new IllegalArgumentException("Restaurant with ID " + restaurantId + " not found");
         }
+    }
+
+    @Transactional
+    public FoodCategory updateFoodCategory(Long categoryId, FoodCategory updatedCategory) {
+        FoodCategory existingCategory = foodCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+        existingCategory.setName(updatedCategory.getName());
+        return foodCategoryRepository.save(existingCategory);
     }
 
 

@@ -39,10 +39,9 @@ public class ClientService {
             client.setName(updatedClient.getName());
             client.setEmail(updatedClient.getEmail());
             client.setPhone(updatedClient.getPhone());
-            // Update other fields as needed
             return clientRepository.save(client);
         } else {
-            return null; // Client with given id not found
+            return null;
         }
     }
 
