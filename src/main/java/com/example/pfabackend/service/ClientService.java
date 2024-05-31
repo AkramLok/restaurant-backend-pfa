@@ -2,6 +2,7 @@ package com.example.pfabackend.service;
 
 import com.example.pfabackend.entities.Client;
 import com.example.pfabackend.entities.Restaurant;
+import com.example.pfabackend.entities.Waiter;
 import com.example.pfabackend.repository.ClientRepository;
 import com.example.pfabackend.repository.RestaurantRepository;
 import jakarta.transaction.Transactional;
@@ -44,6 +45,8 @@ public class ClientService {
             return null;
         }
     }
+
+
 
     public void deleteClient(Long id) {
         clientRepository.deleteById(id);

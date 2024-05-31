@@ -1,6 +1,7 @@
 package com.example.pfabackend.Controllers;
 
 import com.example.pfabackend.entities.Client;
+import com.example.pfabackend.entities.Waiter;
 import com.example.pfabackend.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ public class ClientController {
     public Client createClient(@RequestBody Client client) {
         return clientService.createClient(client);
     }
+
 
     @PutMapping("/{id}")
     public Client updateClient(@PathVariable Long id, @RequestBody Client updatedClient) {
