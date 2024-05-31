@@ -1,6 +1,7 @@
 package com.example.pfabackend.Controllers;
 
-import com.example.pfabackend.dto.CreateParticipationRequest;
+import com.example.pfabackend.dto.ParticipationConverter;
+import com.example.pfabackend.dto.ParticipationDTO;
 import com.example.pfabackend.entities.FeedBack;
 import com.example.pfabackend.entities.Participation;
 import com.example.pfabackend.payload.response.MessageResponse;
@@ -17,6 +18,8 @@ import java.util.List;
 public class ParticipationController {
 
     private final ParticipationService participationService;
+    @Autowired
+    private ParticipationConverter participationConverter;
 
     @Autowired
     public ParticipationController(ParticipationService participationService) {
@@ -24,24 +27,35 @@ public class ParticipationController {
     }
 
     @GetMapping
-    public List<Participation> getAllParticipations() {
-        return participationService.getAllParticipations();
+    public ResponseEntity<List<ParticipationDTO>> getAllParticipations() {
+        List<Participation> participations = participationService.getAllParticipations();
+        List<ParticipationDTO> participationDTOs = participationConverter.convertToDtoList(participations);
+        return ResponseEntity.ok(participationDTOs);
     }
 
     @GetMapping("/restaurant/{restaurantId}")
-    public List<Participation> getAllParticipationsForRestaurant(@PathVariable Long restaurantId) {
-        return participationService.getAllParticipationsForRestaurant(restaurantId);
+    public ResponseEntity<List<ParticipationDTO>> getAllParticipationsForRestaurant(@PathVariable Long restaurantId) {
+        List<Participation> participations = participationService.getAllParticipationsForRestaurant(restaurantId);
+        List<ParticipationDTO> participationDTOs = participationConverter.convertToDtoList(participations);
+        return ResponseEntity.ok(participationDTOs);
     }
 
     @GetMapping("/client/{clientId}")
-    public List<Participation> getAllParticipationsForClient(@PathVariable Long clientId) {
-        return participationService.getAllParticipationsForClient(clientId);
+    public ResponseEntity<List<ParticipationDTO>> getAllParticipationsForClient(@PathVariable Long clientId) {
+        List<Participation> participations = participationService.getAllParticipationsForClient(clientId);
+        List<ParticipationDTO> participationDTOs = participationConverter.convertToDtoList(participations);
+        return ResponseEntity.ok(participationDTOs);
     }
 
     @PostMapping
-    public ResponseEntity<Participation> createParticipation(@RequestBody CreateParticipationRequest request) {
-        Participation createdParticipation = participationService.createParticipation(request.getClientId(), request.getRestaurantId(), request.getPoints());
-        return ResponseEntity.ok(createdParticipation);
+    public ResponseEntity<ParticipationDTO> createParticipation(@RequestBody ParticipationDTO participationDTO) {
+        Participation createdParticipation = participationService.createParticipation(
+                participationDTO.getClientId(),
+                participationDTO.getRestaurantId(),
+                participationDTO.getPoints()
+        );
+        ParticipationDTO createdParticipationDTO = participationConverter.convertToDto(createdParticipation);
+        return ResponseEntity.ok(createdParticipationDTO);
     }
 
     @DeleteMapping("/{clientId}/{restaurantId}")
@@ -53,12 +67,12 @@ public class ParticipationController {
     @PutMapping("/add-points/{clientId}/{restaurantId}/{pointsToAdd}")
     public ResponseEntity<?> addPoints(@PathVariable Long clientId, @PathVariable Long restaurantId, @PathVariable int pointsToAdd) {
         participationService.addPoints(clientId, restaurantId, pointsToAdd);
-        return ResponseEntity.ok(new MessageResponse("Points added successfully."));
+        return ResponseEntity.ok(new MessageResponse("Points added successfully!"));
     }
 
     @PutMapping("/reduce-points/{clientId}/{restaurantId}/{pointsToReduce}")
     public ResponseEntity<?> reducePoints(@PathVariable Long clientId, @PathVariable Long restaurantId, @PathVariable int pointsToReduce) {
         participationService.reducePoints(clientId, restaurantId, pointsToReduce);
-        return ResponseEntity.ok(new MessageResponse("Points reduced successfully."));
+        return ResponseEntity.ok(new MessageResponse("Points reduced successfully!"));
     }
 }

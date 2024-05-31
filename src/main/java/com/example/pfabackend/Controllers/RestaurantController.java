@@ -27,6 +27,23 @@ public class RestaurantController {
         return restaurantService.getAllRestaurants();
     }
 
+    @GetMapping("/imagesIncluded")
+    public ResponseEntity<List<Restaurant>> getAllRestaurantsWithLinks() {
+        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+        String baseUrl = "http://localhost:8080/api/restaurants/files/";
+
+        restaurants.forEach(restaurant -> {
+            if (restaurant.getCoverImageUrl() != null) {
+                restaurant.setCoverImageUrl(baseUrl + restaurant.getCoverImageUrl());
+            }
+            if (restaurant.getLogoUrl() != null) {
+                restaurant.setLogoUrl(baseUrl + restaurant.getLogoUrl());
+            }
+        });
+
+        return ResponseEntity.ok(restaurants);
+    }
+
     @GetMapping("/{id}")
     public Restaurant getRestaurantById(@PathVariable Long id) {
         return restaurantService.getRestaurantById(id);
@@ -36,6 +53,8 @@ public class RestaurantController {
     public Restaurant getRestaurantByOwnerId(@PathVariable Long id){
         return restaurantService.getRestaurantByOwnerId(id);
     }
+
+
 
     @PostMapping
     public ResponseEntity<?> createRestaurant(@RequestPart Restaurant restaurant, @RequestParam("logoFile") MultipartFile logoFile, @RequestParam("coverFile") MultipartFile coverFile, @RequestParam("ownerId") String ownerId ) {

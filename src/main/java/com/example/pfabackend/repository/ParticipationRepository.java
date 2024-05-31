@@ -14,4 +14,5 @@ public interface ParticipationRepository extends JpaRepository<Participation, Pa
     List<Participation> findByRestaurantId(Long restaurantId);
 
     List<Participation> findByClientId(Long clientId);
+
 }
