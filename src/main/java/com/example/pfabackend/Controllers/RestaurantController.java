@@ -88,4 +88,6 @@ public class RestaurantController {
     public void deleteRestaurant(@PathVariable Long id) {
         restaurantService.deleteRestaurant(id);
     }
+
+
 }
