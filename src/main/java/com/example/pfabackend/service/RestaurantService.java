@@ -2,11 +2,13 @@ package com.example.pfabackend.service;
 
 import com.example.pfabackend.entities.Owner;
 import com.example.pfabackend.entities.Restaurant;
+import com.example.pfabackend.payload.response.MessageResponse;
 import com.example.pfabackend.repository.OwnerRepository;
 import com.example.pfabackend.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -81,18 +83,35 @@ public class RestaurantService {
         }
     }
 
-    public Restaurant updateRestaurant(Long id, Restaurant updatedRestaurant) {
+    public void updateRestaurant(Long id, MultipartFile logoFile, MultipartFile coverFile, Restaurant updatedRestaurant) {
         Optional<Restaurant> optionalRestaurant = restaurantRepository.findById(id);
         if (optionalRestaurant.isPresent()) {
             Restaurant restaurant = optionalRestaurant.get();
             if (updatedRestaurant.getName() != null) {
                 restaurant.setName(updatedRestaurant.getName());
             }
-            if (updatedRestaurant.getCoverImageUrl() != null) {
-                restaurant.setCoverImageUrl(updatedRestaurant.getCoverImageUrl());
+            if (logoFile == null || logoFile.isEmpty()) {
+                System.out.println("No logo image found");
             }
-            if (updatedRestaurant.getLogoUrl() != null) {
-                restaurant.setLogoUrl(updatedRestaurant.getLogoUrl());
+            else{
+                init();
+                String randomLogoFileName = UUID.randomUUID().toString();
+                String fileLogoExtension = StringUtils.getFilenameExtension(logoFile.getOriginalFilename());
+                String combinedLogoFileName = randomLogoFileName + "." + fileLogoExtension;
+                saveRestaurantImage(logoFile, combinedLogoFileName);
+                restaurant.setLogoUrl(combinedLogoFileName);
+            }
+            if (coverFile == null || coverFile.isEmpty()) {
+                System.out.println("No logo image found");
+            }
+            else
+            {
+                init();
+                String randomCoverFileName = UUID.randomUUID().toString();
+                String fileCoverExtension = StringUtils.getFilenameExtension(coverFile.getOriginalFilename());
+                String combinedCoverFileName = randomCoverFileName + "." + fileCoverExtension;
+                saveRestaurantImage(coverFile, combinedCoverFileName);
+                restaurant.setCoverImageUrl(combinedCoverFileName);
             }
             if (updatedRestaurant.getCuisine() != null) {
                 restaurant.setCuisine(updatedRestaurant.getCuisine());
@@ -118,7 +137,6 @@ public class RestaurantService {
             if (updatedRestaurant.getPriceRange() != null) {
                 restaurant.setPriceRange(updatedRestaurant.getPriceRange());
             }
-            // Update location fields if provided
             if (updatedRestaurant.getLocation() != null) {
                 if (updatedRestaurant.getLocation().getLatitude() != 0) {
                     restaurant.getLocation().setLatitude(updatedRestaurant.getLocation().getLatitude());
@@ -127,10 +145,7 @@ public class RestaurantService {
                     restaurant.getLocation().setLongitude(updatedRestaurant.getLocation().getLongitude());
                 }
             }
-            // Update other fields as needed
-            return restaurantRepository.save(restaurant);
-        } else {
-            return null; // Restaurant with given id not found
+            restaurantRepository.save(restaurant);
         }
     }
 

@@ -1,14 +1,16 @@
 package com.example.pfabackend.Controllers;
 
+import com.example.pfabackend.dto.FeedBackDTO;
 import com.example.pfabackend.entities.FeedBack;
 import com.example.pfabackend.service.FeedBackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/feedback")
+@RequestMapping("/api/feedback")
 public class FeedBackController {
 
     private final FeedBackService feedBackService;
@@ -18,9 +20,16 @@ public class FeedBackController {
         this.feedBackService = feedBackService;
     }
 
-    @GetMapping
+    /*@GetMapping
     public List<FeedBack> getAllFeedBacks() {
         return feedBackService.getAllFeedBacks();
+    }*/
+    @GetMapping
+    public List<FeedBackDTO> getAllFeedBacks() {
+        List<FeedBack> feedBacks = feedBackService.getAllFeedBacks();
+        return feedBacks.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/restaurant/{restaurantId}")
@@ -41,5 +50,13 @@ public class FeedBackController {
     @DeleteMapping("/{feedBackId}")
     public void deleteFeedBack(@PathVariable Long feedBackId) {
         feedBackService.deleteFeedBack(feedBackId);
+    }
+
+    private FeedBackDTO convertToDTO(FeedBack feedBack) {
+        FeedBackDTO dto = new FeedBackDTO();
+        dto.setId(feedBack.getId());
+        dto.setDescription(feedBack.getDescription());
+        dto.setRating(feedBack.getRating());
+        return dto;
     }
 }

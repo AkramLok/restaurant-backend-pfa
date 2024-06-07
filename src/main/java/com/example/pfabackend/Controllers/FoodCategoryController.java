@@ -50,6 +50,14 @@ public class FoodCategoryController {
         return ResponseEntity.ok(new MessageResponse("Category created successfully in restaurant "+restaurantService.getRestaurantById(restaurantId).getName()));
     }
 
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<?> updateFoodCategory(
+            @PathVariable Long categoryId,
+            @RequestBody FoodCategory foodCategory) {
+        FoodCategory updatedCategory = foodCategoryService.updateFoodCategory(categoryId, foodCategory);
+        return ResponseEntity.ok(updatedCategory);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFoodCategory(@PathVariable Long id) {
         foodCategoryService.deleteFoodCategory(id);
