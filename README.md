@@ -2,9 +2,9 @@
 This repository contains the backend API for the Restaurant Management System, developed with Spring Boot. It handles all the core functionalities of the system, including managing restaurant data, orders, promotions, and user accounts. The API serves both the mobile app (for clients and servers) and the web app (for restaurant owners).
 
 ## Front Links : 
-  #### Front Website (for Owners) : https://github.com/AkramLok/restaurant-frontend-web-pfa
-  #### Mobile application (for Clients) : https://github.com/oussama-krittel/pfa-client-mobile-app - https://github.com/AkramLok/restaurant-mobile-pfa/
-  #### Mobile application for login test only (waiter login need some id): https://github.com/AkramLok/resstaurant-mobile-test-pfa
+  #### Front Website (for Owners) : [Restaurant Frontend Web](https://github.com/AkramLok/restaurant-frontend-web-pfa)
+  #### Mobile application (for Clients) : [Restaurant Moble APP](https://github.com/AkramLok/restaurant-mobile-pfa) - [Restaurant Moble APP2](https://github.com/oussama-krittel/pfa-client-mobile-app )
+  #### Mobile application for login test only (waiter login need some id): [Restaurant Moble Test APP](https://github.com/AkramLok/resstaurant-mobile-test-pfa)
 
 ## Key Features
 - User Management: Manage user accounts for admins, servers, and clients.
