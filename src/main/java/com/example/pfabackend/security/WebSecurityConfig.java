@@ -78,6 +78,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //  }
   
   @Bean
+  @SuppressWarnings("java:S4502")
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))

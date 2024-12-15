@@ -36,10 +36,10 @@ public class RestaurantService {
             throw new RuntimeException("Could not initialize folder for upload!");
         }
     }
-
+    @SuppressWarnings("java:S6813")
     @Autowired
     private RestaurantRepository restaurantRepository;
-
+    @SuppressWarnings("java:S6813")
     @Autowired
     private OwnerService ownerService;
 
